@@ -9,6 +9,8 @@ export interface Team {
 export interface Match {
   id: number | string;
   date: string;
+  season?: number | string;
+  venue?: string;
 
   league: {
     id: number | string;
