@@ -29,15 +29,18 @@ interface FavoritesContextValue {
   signOut: () => Promise<void>;
 }
 
+// globálny context pre obľúbené zápasy
 const FavoritesContext = createContext<FavoritesContextValue | undefined>(
   undefined
 );
 
+// pomocný kľúč (sport+id)
 function makeKey(id: Match["id"], sport: string) {
   return `${sport}:${String(id)}`;
 }
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
+  // lokálny stav so zápasmi a auth údajmi
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [auth, setAuth] = useState<AuthState>({
     session: undefined,
@@ -45,6 +48,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     loading: true,
   });
 
+  // načítanie supabase session
   const refreshSession = useCallback(async () => {
     if (!supabase) {
       setAuth({ session: undefined, userEmail: undefined, loading: false });
@@ -60,6 +64,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // načítanie zápasov zo supabase tabuľky
   const refreshFavorites = useCallback(async () => {
     if (!supabase) {
       setFavorites([]);
@@ -89,11 +94,13 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     setFavorites(mapped);
   }, []);
 
+  // prvotné načítanie po mountnutí
   useEffect(() => {
     refreshSession();
     refreshFavorites();
   }, [refreshSession, refreshFavorites]);
 
+  // listener na zmeny session
   useEffect(() => {
     if (!supabase) return;
     const {
@@ -105,6 +112,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [refreshSession, refreshFavorites]);
 
+  // odhlásenie + lokálny reset
   const signOut = useCallback(async () => {
     if (!supabase) return;
     await supabase.auth.signOut();

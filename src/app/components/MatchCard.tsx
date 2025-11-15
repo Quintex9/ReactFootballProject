@@ -8,6 +8,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toggleFavoriteAction } from "@/app/actions/favorites";
 
+// kódy pre živý zápas
 const LIVE_CODES = new Set([
   "LIVE",
   "1H",
@@ -110,6 +111,7 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
     minute: "2-digit",
   });
 
+  // vytvorenie odkazu na detail so serializovaným zápasom
   const buildDetailHref = (teamId: number | string) => {
     const encodedSport = encodeURIComponent(sport);
     const matchPayload = encodeURIComponent(JSON.stringify(match));

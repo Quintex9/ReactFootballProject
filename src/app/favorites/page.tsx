@@ -13,6 +13,7 @@ type FavoriteRow = {
 export const dynamic = "force-dynamic";
 
 export default async function FavoritesPage() {
+  // server component – získame cookie store kvôli session
   const cookieStore = await cookies();
   const supabase = createServerComponentClient({
     cookies: () =>
@@ -23,9 +24,11 @@ export default async function FavoritesPage() {
   } = await supabase.auth.getSession();
 
   if (!session) {
+    // bez session presmerujeme na auth
     redirect("/auth");
   }
 
+  // vyberieme obľúbené zápasy pre prihláseného používateľa
   const { data } = (await supabase
     .from("favorites")
     .select("sport, match_payload")
@@ -50,6 +53,7 @@ export default async function FavoritesPage() {
           </span>
         </div>
 
+        {/* hero sekcia s rýchlymi metrikami */}
         <section className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-10 shadow-[0_25px_55px_rgba(15,23,42,0.65)] space-y-5">
           <div className="space-y-3">
             <p className="text-xs uppercase tracking-[0.45em] text-indigo-200/80">
@@ -91,6 +95,7 @@ export default async function FavoritesPage() {
         </section>
 
         {favoriteCount === 0 ? (
+          // prázdny stav, ak nie sú obľúbené
           <div className="rounded-3xl border border-gray-800/70 bg-gray-900/70 px-6 py-10 text-center text-gray-300 shadow-[0_15px_40px_rgba(15,23,42,0.45)]">
             <p className="text-lg font-semibold mb-2">
               Zatiaľ žiadne obľúbené zápasy
@@ -101,6 +106,7 @@ export default async function FavoritesPage() {
             </p>
           </div>
         ) : (
+          // zoznam uložených zápasov
           <div className="grid gap-5">
             {favorites.map((favorite) => (
               <MatchCard

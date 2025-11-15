@@ -7,6 +7,7 @@ import { Match } from "@/lib/types";
 export default function LiveMatches({ sport }: { sport: string }) {
   const [matches, setMatches] = useState<Match[]>([]);
 
+  // načítanie dát z internej API route
   async function load() {
     try {
       const res = await fetch(`/api/live?sport=${sport}`, {
@@ -20,12 +21,12 @@ export default function LiveMatches({ sport }: { sport: string }) {
   }
 
   useEffect(() => {
-  setMatches([]); // reset pri zmene sportu
-  load();
+    setMatches([]); // reset pri zmene sportu
+    load();
 
-  const interval = setInterval(load, 20000);
-  return () => clearInterval(interval);
-}, [sport]);
+    const interval = setInterval(load, 20000);
+    return () => clearInterval(interval);
+  }, [sport]);
 
 
   if (matches.length === 0) {

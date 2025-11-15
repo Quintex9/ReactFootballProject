@@ -9,6 +9,7 @@ const FALLBACK_ORIGIN =
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000");
 
+// jednoduchý fetch helper s vypnutou cache
 async function fetchJson(url: string) {
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) {
@@ -17,6 +18,7 @@ async function fetchJson(url: string) {
   return res.json();
 }
 
+// fallback fetch detailu cez internú API route
 async function fetchMatchFromApiRoute(
   origin: string,
   sport: SportKey,
@@ -29,6 +31,7 @@ async function fetchMatchFromApiRoute(
   return list[0] ?? null;
 }
 
+// pomocník pre H2H zoznam
 async function fetchHeadToHead(
   origin: string,
   sport: SportKey,
@@ -59,6 +62,7 @@ const LIVE_STATUS_CODES = new Set([
   "P3",
 ]);
 
+// zistí či status znamená živý zápas
 function isLiveStatus(status: Match["status"]) {
   const code = (status.short || status.long || "").toUpperCase();
   if (LIVE_STATUS_CODES.has(code)) {
@@ -97,6 +101,7 @@ export default async function MatchDetailsPage({
   const origin = process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK_ORIGIN;
 
   if (!origin) {
+    // ak nevieme zostaviť origin (chýba SITE_URL), vrátime chybovú obrazovku
     return (
       <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-6 text-center">
         <div className="space-y-3 max-w-md">
@@ -113,6 +118,7 @@ export default async function MatchDetailsPage({
     let match: Match | null = matchFromQuery;
 
     try {
+      // pokus najprv nájsť zápas v live odpovedi pre zvolený šport
       if (!match) {
         const liveResponse = await fetch(
           `${origin}/api/live?sport=${sport}`,
@@ -135,6 +141,7 @@ export default async function MatchDetailsPage({
     }
 
     if (!match) {
+      // ak sa nenašiel, skúsime internú route s matchId
       match = await fetchMatchFromApiRoute(origin, sport, matchId);
     }
 

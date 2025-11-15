@@ -2,6 +2,7 @@
 
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
+// čítame verejné supabase údaje z env
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -11,6 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// klient sa vytvorí len ak máme konfiguráciu
 export const supabase =
   supabaseUrl && supabaseAnonKey
     ? createClientComponentClient({

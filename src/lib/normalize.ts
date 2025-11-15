@@ -1,5 +1,8 @@
 import { Match } from "./types";
 
+// Pomocné funkcie na zjednotenie odpovedí z API-Sports do typu Match
+
+// normalizácia odpovede z v3 football API
 export function normalizeFootball(item: any): Match {
   return {
     id: item.fixture.id,
@@ -37,6 +40,7 @@ export function normalizeFootball(item: any): Match {
   };
 }
 
+// fallback normalizácia pre v1 športy (basketbal, hokej ...)
 export function normalizeV1(item: any): Match {
   const teams = item.teams ?? item.game?.teams ?? {};
   const homeTeam = teams.home ?? teams.localteam ?? {};

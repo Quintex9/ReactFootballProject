@@ -1,6 +1,7 @@
 import { Match } from "./types";
 import { normalizeFootball, normalizeV1 } from "./normalize";
 
+// centrálna konfigurácia športov pre API-Sports
 export type SportKey =
   | "football"
   | "nba"
@@ -16,6 +17,7 @@ export interface SportConfig {
   supportsH2H?: boolean;
 }
 
+// mapovanie športu na endpoint + normalizátor
 export const SPORT_CONFIG: Record<SportKey, SportConfig> = {
   football: {
     endpoint: "https://v3.football.api-sports.io/fixtures",
@@ -45,6 +47,7 @@ export const SPORT_CONFIG: Record<SportKey, SportConfig> = {
   },
 };
 
+// bezpečne zistí šport s fallbackom
 export function resolveSport(key: string | null | undefined): SportKey {
   const fallback: SportKey = "football";
   if (!key) return fallback;
@@ -54,6 +57,7 @@ export function resolveSport(key: string | null | undefined): SportKey {
     : fallback;
 }
 
+// API-Sports vracia rôzne kontajnery, čiže tu ich zjednotíme
 export function extractList(raw: any) {
   const list =
     raw?.response?.games ??

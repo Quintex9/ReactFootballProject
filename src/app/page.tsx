@@ -10,6 +10,7 @@ import { useFavorites } from "@/context/FavoritesContext";
 export default function HomePage() {
   const { auth, signOut } = useFavorites();
   const searchParams = useSearchParams();
+  // aktuálny šport z query parametrov
   const selectedSport = searchParams.get("sport") || "football";
   const sportLabel =
     SPORTS.find((sport) => sport.key === selectedSport)?.label ?? "Football";
@@ -17,6 +18,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen w-full bg-gradient-to-b from-[#050505] via-slate-950 to-[#050505] text-white">
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+        {/* hero blok so základným prehľadom */}
         <header className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-10 shadow-[0_25px_55px_rgba(15,23,42,0.65)]">
           <div className="flex flex-col gap-4">
             <p className="text-xs uppercase tracking-[0.5em] text-indigo-200/70">
@@ -55,6 +57,7 @@ export default function HomePage() {
           </div>
         </header>
 
+        {/* výber športu */}
         <SportSelector />
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -115,6 +118,7 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* živé zápasy */}
         <LiveMatches sport={selectedSport} />
       </div>
     </main>

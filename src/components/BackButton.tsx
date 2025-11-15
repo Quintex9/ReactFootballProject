@@ -7,6 +7,7 @@ export default function BackButton({
 }: {
   label?: string;
 }) {
+  // jednoduché tlačidlo využíva router.back()
   const router = useRouter();
   return (
     <button

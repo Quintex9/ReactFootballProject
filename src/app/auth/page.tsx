@@ -7,12 +7,14 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function AuthPage() {
   const router = useRouter();
+  // prepínač medzi loginom a registráciou
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // obsluha formulára
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!supabase) {

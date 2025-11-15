@@ -23,6 +23,7 @@ export default function MatchDetails({
     minute: "2-digit",
   });
 
+  // jednoduchý renderer karty tímu
   const renderTeam = (team: Match["home"], score: number | null) => {
     const logo = team.logo ?? "/window.svg";
     return (
@@ -40,6 +41,7 @@ export default function MatchDetails({
     );
   };
 
+  // základné informácie o zápase
   const matchInfo = [
     { label: "Dátum a čas", value: fixtureDate },
     { label: "Liga", value: match.league.name },
@@ -54,6 +56,7 @@ export default function MatchDetails({
     },
   ];
 
+  // sekcia stavu stretnutia
   const statusInfo = [
     { label: "Stav", value: match.status.long },
     { label: "Kód stavu", value: match.status.short || "—" },
@@ -85,6 +88,7 @@ export default function MatchDetails({
     return { label: "Remíza", color: "text-amber-300" };
   };
 
+  // sumár pre každý tím
   const teamInfo = [
     {
       side: "Domáci tím",

@@ -9,6 +9,7 @@ import { Match } from "@/lib/types";
 
 const today = new Date().toISOString().split("T")[0];
 
+// mapovanie športu -> URL pre live dáta
 const LIVE_API: Record<string, string> = {
   football: "https://v3.football.api-sports.io/fixtures?live=all",
 
@@ -20,6 +21,7 @@ const LIVE_API: Record<string, string> = {
   handball: `https://v1.handball.api-sports.io/games?date=${today}`,
 };
 
+// helper pre fetch s API kľúčom
 async function fetchFromApi(url: string, apiKey: string) {
   const res = await fetch(url, {
     headers: { "x-apisports-key": apiKey },
@@ -41,6 +43,7 @@ export async function GET(req: NextRequest) {
   const config = SPORT_CONFIG[sport];
 
   if (!apiKey) {
+    // bez kľúča končíme
     return NextResponse.json(
       { error: "Missing APISPORTS_KEY env" },
       { status: 500 }
@@ -48,6 +51,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (!LIVE_API[sport]) {
+    // neznámy šport
     return NextResponse.json(
       { error: `Unknown sport: ${sport}` },
       { status: 400 }
@@ -64,6 +68,7 @@ export async function GET(req: NextRequest) {
 
   try {
     if (matchId) {
+      // detail zápasu podľa ID
       const data = await fetchFromApi(
         `${config.endpoint}?id=${matchId}`,
         apiKey
@@ -73,6 +78,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (h2h) {
+      // head-to-head len ak šport podporuje
       if (!config.supportsH2H) {
         return NextResponse.json(
           { error: "H2H unsupported for this sport", response: [] },
@@ -108,6 +114,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (teamId) {
+      // fetch posledných zápasov tímu
       const fetchTeamData = async (useLast: boolean) => {
         const params = new URLSearchParams({ team: teamId });
 
@@ -181,6 +188,7 @@ export async function GET(req: NextRequest) {
       response: normalized,
     });
   } catch (err) {
+    // fallback 500 s detailami
     return NextResponse.json(
       { error: "Fetch failed", details: String(err) },
       { status: 500 }

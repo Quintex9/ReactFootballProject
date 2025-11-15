@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
+// dostupné športy v prepínači
 export const SPORTS = [
   { key: "football", label: "Football" },
   { key: "nba", label: "NBA" },
@@ -19,6 +20,7 @@ export default function SportSelector() {
 
   return (
     <div className="w-full max-w-4xl">
+      {/* hlavička prepínača */}
       <p className="text-xs uppercase tracking-[0.35em] text-gray-500 mb-2">
         Výber športu
       </p>
