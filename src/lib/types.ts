@@ -1,33 +1,33 @@
 // Rozhranie pre tím
 export interface Team {
-    id : number;
+    id : number | string;
     name : string;
-    logo : string;
+    logo : string | null;
 }
 
-// Rozhranie pre zápas
+// Rozhranie pre zápas, funkčnosť pre všetky športy
 export interface Match {
-  fixture: {
-    id: number;
-    date: string; 
-    status: {
-      long: string;  
-      short: string;  
-      elapsed: number;
-    };
-  };
+  id: number | string;
+  date: string;
+
   league: {
-    id: number;
+    id: number | string;
     name: string;
-    logo: string;
+    logo: string | null;
   };
-  teams: {
-    home: Team; 
-    away: Team; 
+
+  status: {
+    long: string;
+    short: string;
+    elapsed: number | null;
   };
-  goals: {
-    home: number | null; 
-    away: number | null; 
+
+  home: Team;
+  away: Team;
+
+  score: {
+    home: number | null;
+    away: number | null;
   };
 }
 

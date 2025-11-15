@@ -6,12 +6,12 @@ interface MatchCardProps {
 }
 
 export default function MatchCard({ match }: MatchCardProps) {
-  const { home, away } = match.teams;
-  const { long: status, elapsed } = match.fixture.status;
-  const scoreHome = match.goals.home;
-  const scoreAway = match.goals.away;
+  const { home, away } = match;
+  const { long: status, elapsed } = match.status;
+  const scoreHome = match.score.home;
+  const scoreAway = match.score.away;
   const { name: league } = match.league;
-  const { date } = match.fixture;
+  const date = match.date;
 
   // Skrátené verzie statusu pre malé obrazovky
   const shortStatus =
