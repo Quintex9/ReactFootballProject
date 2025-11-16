@@ -1,44 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { useSearchParams } from "next/navigation";
 import MatchCard from "./MatchCard";
 import { Match } from "@/lib/types";
 
-export default function LiveMatches({ sport }: { sport: string }) {
-  const [matches, setMatches] = useState<Match[]>([]);
+const fetcher = (url: string) =>
+  fetch(url, { cache: "no-store" }).then((res) => res.json());
 
-  // načítanie dát z internej API route
-  async function load() {
-    try {
-      const res = await fetch(`/api/live?sport=${sport}`, {
-        cache: "no-store",
-      });
-      const json = await res.json();
-      setMatches(json.response ?? []);
-    } catch (e) {
-      console.error(e);
-    }
+export default function LiveMatches({ sport }: { sport: string }) {
+  const params = useSearchParams();
+  const league = params.get("league") ?? "";
+
+  // kľúč sa mení podľa SPORT + LEAGUE → SWR automaticky refetchne
+  const apiUrl = `/api/live?sport=${sport}${league ? `&league=${league}` : ""}`;
+
+  const { data, error, isLoading } = useSWR(apiUrl, fetcher, {
+    refreshInterval: 20000, // každých 20 sekúnd
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+  });
+
+  const matches: Match[] = data?.response ?? [];
+
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-5xl rounded-3xl border border-gray-800/70 bg-gray-900/70 px-6 py-10 text-center text-gray-300 mt-8">
+        <p className="text-lg font-semibold mb-2">Načítavam live zápasy…</p>
+        <p className="text-sm text-gray-400">Prosím počkajte.</p>
+      </div>
+    );
   }
 
-  useEffect(() => {
-    setMatches([]); // reset pri zmene sportu
-    load();
-
-    const interval = setInterval(load, 20000);
-    return () => clearInterval(interval);
-  }, [sport]);
-
+  if (error) {
+    return (
+      <div className="w-full max-w-5xl rounded-3xl border border-gray-800/70 bg-gray-900/70 px-6 py-10 text-center text-gray-300 mt-8">
+        <p className="text-lg font-semibold mb-2">Chyba pri načítaní dát.</p>
+        <p className="text-sm text-gray-400">
+          Skontrolujte pripojenie alebo API limity.
+        </p>
+      </div>
+    );
+  }
 
   if (matches.length === 0) {
     return (
       <div className="w-full max-w-5xl rounded-3xl border border-gray-800/70 bg-gray-900/70 px-6 py-10 text-center text-gray-300 mt-8">
         <p className="text-lg font-semibold mb-2">
-          Momentálne nevidíme žiadne live zápasy.
+          Žiadne zápasy pre túto ligu alebo šport.
         </p>
-        <p className="text-sm text-gray-400">
-          Buď sa práve nehrá, alebo API dosiahlo denný limit požiadaviek.
-          Skúste to o pár minút neskôr.
-        </p>
+        <p className="text-sm text-gray-400">Skúste zmeniť filter.</p>
       </div>
     );
   }

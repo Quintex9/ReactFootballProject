@@ -7,13 +7,11 @@ import {
 } from "@/lib/sportsConfig";
 import { Match } from "@/lib/types";
 
-const today = new Date().toISOString().split("T")[0];
+// lokálny dátum, nie UTC (sv-SE = YYYY-MM-DD)
+const today = new Date().toLocaleDateString("sv-SE");
 
-// mapovanie športu -> URL pre live dáta
 const LIVE_API: Record<string, string> = {
   football: "https://v3.football.api-sports.io/fixtures?live=all",
-
-  // V1 športy NEMAJÚ LIVE v base/free pláne, použijem podľa dátumu:
   nba: `https://v1.basketball.api-sports.io/games?date=${today}`,
   mlb: `https://v1.baseball.api-sports.io/games?date=${today}`,
   nfl: `https://v1.american-football.api-sports.io/games?date=${today}`,
@@ -21,17 +19,14 @@ const LIVE_API: Record<string, string> = {
   handball: `https://v1.handball.api-sports.io/games?date=${today}`,
 };
 
-// helper pre fetch s API kľúčom
 async function fetchFromApi(url: string, apiKey: string) {
   const res = await fetch(url, {
     headers: { "x-apisports-key": apiKey },
     cache: "no-store",
   });
-
   if (!res.ok) {
     throw new Error(`Upstream API error (${res.status})`);
   }
-
   return res.json();
 }
 
@@ -43,7 +38,6 @@ export async function GET(req: NextRequest) {
   const config = SPORT_CONFIG[sport];
 
   if (!apiKey) {
-    // bez kľúča končíme
     return NextResponse.json(
       { error: "Missing APISPORTS_KEY env" },
       { status: 500 }
@@ -51,7 +45,6 @@ export async function GET(req: NextRequest) {
   }
 
   if (!LIVE_API[sport]) {
-    // neznámy šport
     return NextResponse.json(
       { error: `Unknown sport: ${sport}` },
       { status: 400 }
@@ -63,12 +56,14 @@ export async function GET(req: NextRequest) {
   const h2h = req.nextUrl.searchParams.get("h2h");
   const last = req.nextUrl.searchParams.get("last") ?? "5";
   const season = req.nextUrl.searchParams.get("season");
+  const league = req.nextUrl.searchParams.get("league"); // toto je filter ligy
+
   const lastCount = Math.max(parseInt(last, 10) || 5, 1);
   const fallbackSeason = new Date().getFullYear().toString();
 
   try {
+    /* MATCH DETAIL */
     if (matchId) {
-      // detail zápasu podľa ID
       const data = await fetchFromApi(
         `${config.endpoint}?id=${matchId}`,
         apiKey
@@ -77,8 +72,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ sport, response: list });
     }
 
+    /* H2H */
     if (h2h) {
-      // head-to-head len ak šport podporuje
       if (!config.supportsH2H) {
         return NextResponse.json(
           { error: "H2H unsupported for this sport", response: [] },
@@ -87,19 +82,8 @@ export async function GET(req: NextRequest) {
       }
 
       const [teamA, teamB] = h2h.split("-");
-      if (!teamA || !teamB) {
-        return NextResponse.json(
-          { error: "Invalid h2h format, expected teamA-teamB" },
-          { status: 400 }
-        );
-      }
-
-      const params = new URLSearchParams({
-        h2h: `${teamA}-${teamB}`,
-      });
-      if (season) {
-        params.set("season", season);
-      }
+      const params = new URLSearchParams({ h2h: `${teamA}-${teamB}` });
+      if (season) params.set("season", season);
 
       const data = await fetchFromApi(
         `${config.endpoint}/headtohead?${params.toString()}`,
@@ -113,17 +97,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    /* LAST MATCHES FOR TEAM */
     if (teamId) {
-      // fetch posledných zápasov tímu
       const fetchTeamData = async (useLast: boolean) => {
         const params = new URLSearchParams({ team: teamId });
 
         if (config.supportsLast !== false) {
           params.set("season", season ?? fallbackSeason);
         }
-        if (useLast) {
-          params.set("last", String(lastCount));
-        }
+        if (useLast) params.set("last", String(lastCount));
+
         const data = await fetchFromApi(
           `${config.endpoint}?${params.toString()}`,
           apiKey
@@ -131,7 +114,7 @@ export async function GET(req: NextRequest) {
         return extractList(data).map(config.normalize);
       };
 
-      const attempts: boolean[] =
+      const attempts =
         config.supportsLast === false ? [false] : [true, false];
 
       let list: Match[] = [];
@@ -142,41 +125,41 @@ export async function GET(req: NextRequest) {
           list = await fetchTeamData(useLast);
         } catch (err) {
           lastError = err;
-          continue;
         }
-        if (list.length > 0) {
-          break;
-        }
+        if (list.length > 0) break;
       }
 
-      if (!list.length && lastError) {
-        throw lastError;
-      }
+      if (!list.length && lastError) throw lastError;
 
       const limited = list
-        .sort(
-          (a, b) =>
-            new Date(b.date).valueOf() - new Date(a.date).valueOf()
-        )
+        .sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf())
         .slice(0, lastCount);
 
       return NextResponse.json({ sport, response: limited });
     }
 
-    const res = await fetch(LIVE_API[sport], {
+    /* LIVE / TODAY */
+    const baseURL = LIVE_API[sport];
+    const res = await fetch(baseURL, {
       headers: { "x-apisports-key": apiKey },
       cache: "no-store",
     });
 
-    if (!res.ok) {
-      return NextResponse.json(
-        { error: "Upstream API error", status: res.status },
-        { status: res.status }
-      );
-    }
-
     const raw = await res.json();
-    const list = extractList(raw);
+    let list = extractList(raw);
+
+    // FILTROVANIE PODĽA LIGY 
+    if (league) {
+      list = list.filter((m) => {
+        const id =
+          m?.league?.id ??
+          m?.league_id ??
+          m?.league?.league_id ??
+          null;
+
+        return String(id) === String(league);
+      });
+    }
 
     const normalized =
       sport === "football"
@@ -188,7 +171,6 @@ export async function GET(req: NextRequest) {
       response: normalized,
     });
   } catch (err) {
-    // fallback 500 s detailami
     return NextResponse.json(
       { error: "Fetch failed", details: String(err) },
       { status: 500 }
