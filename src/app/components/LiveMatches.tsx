@@ -1,17 +1,19 @@
 "use client";
 
 import useSWR from "swr";
-import { useSearchParams } from "next/navigation";
 import MatchCard from "./MatchCard";
 import { Match } from "@/lib/types";
 
 const fetcher = (url: string) =>
   fetch(url, { cache: "no-store" }).then((res) => res.json());
 
-export default function LiveMatches({ sport }: { sport: string }) {
-  const params = useSearchParams();
-  const league = params.get("league") ?? "";
-
+export default function LiveMatches({ 
+  sport, 
+  league = "" 
+}: { 
+  sport: string; 
+  league?: string;
+}) {
   // kľúč sa mení podľa SPORT + LEAGUE → SWR automaticky refetchne
   const apiUrl = `/api/live?sport=${sport}${league ? `&league=${league}` : ""}`;
 

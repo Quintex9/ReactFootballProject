@@ -12,14 +12,19 @@ function HomeContent() {
   const { auth, signOut } = useFavorites();
   const searchParams = useSearchParams();
   const selectedSport = searchParams.get("sport") || "football";
+  const selectedLeague = searchParams.get("league") || "";
 
   const sportLabel =
     SPORTS.find((sport) => sport.key === selectedSport)?.label ?? "Football";
 
   return (
     <>
-      <SportSelector />
-      <LeagueSelector sport={selectedSport} />
+      <Suspense fallback={<div className="h-12" />}>
+        <SportSelector />
+      </Suspense>
+      <Suspense fallback={<div className="h-12" />}>
+        <LeagueSelector sport={selectedSport} />
+      </Suspense>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl bg-gray-900/70 border border-gray-800/70 p-5">
@@ -80,7 +85,7 @@ function HomeContent() {
         </div>
       </div>
 
-      <LiveMatches sport={selectedSport} />
+      <LiveMatches sport={selectedSport} league={selectedLeague} />
     </>
   );
 }
