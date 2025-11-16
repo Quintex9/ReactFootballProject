@@ -91,38 +91,69 @@ function HomeContent() {
 }
 
 export default function HomePage() {
+  const sportsCount = SPORTS.length;
+
   return (
     <main className="min-h-screen w-full bg-gradient-to-b from-[#050505] via-slate-950 to-[#050505] text-white">
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-        <header className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-10 shadow-xl">
-          <div className="flex flex-col gap-4">
-            <p className="text-xs uppercase tracking-[0.5em] text-indigo-200/70">
-              Live monitoring
-            </p>
-
-            <div className="flex flex-col gap-2">
+        <header className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-2xl p-6 md:p-10 shadow-[0_20px_70px_rgba(15,15,25,0.45)]">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3">
               <h1 className="text-4xl sm:text-5xl font-semibold">
                 Live športové výsledky
               </h1>
-              <p className="text-base text-slate-200/80 max-w-2xl">
-                Sledujte aktuálne dianie naprieč viacerými ligami. Obnovujeme
-                každých 20 sekúnd.
+              <p className="text-base text-slate-200/85 max-w-3xl">
+                Sledujte aktuálne dianie naprieč viacerými ligami. Dáta obnovujeme automaticky,
+                aby ste mali vždy čerstvé skóre aj status zápasov.
               </p>
             </div>
 
-            <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-200/70">
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                <dt className="text-xs uppercase tracking-[0.4em] text-indigo-200">
-                  Auto-refresh
-                </dt>
-                <dd className="text-lg font-semibold text-white">20 sekúnd</dd>
+            <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-200/80">
+              <div className="group relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/10 via-white/5 to-transparent px-5 py-4 shadow-lg shadow-black/25 transition-all duration-300 hover:border-indigo-300/40 hover:shadow-indigo-500/10">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500/20 text-lg">
+                    🔁
+                  </span>
+                  <dt className="text-[11px] uppercase tracking-[0.35em] text-indigo-100">
+                    Auto-refresh
+                  </dt>
+                </div>
+                <dd className="mt-3 text-3xl font-semibold text-white">20 s</dd>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  okamžité obnovenie feedu cez SWR
+                </p>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                <dt className="text-xs uppercase tracking-[0.4em] text-indigo-200">
-                  Zdroj dát
-                </dt>
-                <dd className="text-lg font-semibold text-white">API-SPORTS</dd>
+              <div className="group relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/10 via-white/5 to-transparent px-5 py-4 shadow-lg shadow-black/25 transition-all duration-300 hover:border-emerald-200/40 hover:shadow-emerald-400/10">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/20 text-lg">
+                    📡
+                  </span>
+                  <dt className="text-[11px] uppercase tracking-[0.35em] text-emerald-100">
+                    Zdroj dát
+                  </dt>
+                </div>
+                <dd className="mt-3 text-3xl font-semibold text-white">API-SPORTS</dd>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  oficiálne live endpointy a štatistiky
+                </p>
+              </div>
+
+              <div className="group relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/10 via-white/5 to-transparent px-5 py-4 shadow-lg shadow-black/25 transition-all duration-300 hover:border-amber-200/40 hover:shadow-amber-400/10">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-amber-500/20 text-lg">
+                    ⭐
+                  </span>
+                  <dt className="text-[11px] uppercase tracking-[0.35em] text-amber-100">
+                    Pokryté športy
+                  </dt>
+                </div>
+                <dd className="mt-3 text-3xl font-semibold text-white">
+                  {sportsCount}+
+                </dd>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  futbal, basketbal, hokej a ďalšie ligy
+                </p>
               </div>
             </dl>
           </div>

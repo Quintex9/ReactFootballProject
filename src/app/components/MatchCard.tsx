@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { Match } from "@/lib/types";
 import Image from "next/image";
@@ -42,6 +42,7 @@ const SCHEDULED_CODES = new Set(["NS", "TBD", "POSTP", "CANC", "SCHED", "NOT STA
 
 type StatusVariant = "live" | "finished" | "scheduled" | "default";
 
+// vizuálne varianty podľa stavu zápasu
 const STATUS_STYLES: Record<
   StatusVariant,
   { card: string; dot: string }
@@ -64,6 +65,7 @@ const STATUS_STYLES: Record<
   },
 };
 
+// rozhodne vizuálny variant podľa statusu zápasu
 function resolveStatusVariant(status: Match["status"]): StatusVariant {
   const code = (status.short || status.long || "").toUpperCase();
   const long = status.long.toLowerCase();
@@ -85,6 +87,7 @@ interface MatchCardProps {
   sport: string;
 }
 
+// hlavná karta jedného zápasu s akciou na obľúbené
 export default function MatchCard({ match, sport }: MatchCardProps) {
   const { isFavorite, auth, refreshFavorites } = useFavorites();
   const router = useRouter();
@@ -112,14 +115,16 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
   });
 
   // vytvorenie odkazu na detail so serializovaným zápasom
-  const buildDetailHref = (teamId: number | string) => {
+  const buildDetailHref = (teamId?: number | string) => {
     const encodedSport = encodeURIComponent(sport);
     const matchPayload = encodeURIComponent(JSON.stringify(match));
     const seasonParam =
       season != null ? `&season=${encodeURIComponent(String(season))}` : "";
-    return `/details/${match.id}?sport=${encodedSport}&teamId=${teamId}&matchData=${matchPayload}${seasonParam}`;
+    const teamParam = teamId ? `&teamId=${encodeURIComponent(String(teamId))}` : "";
+    return `/details/${match.id}?sport=${encodedSport}${teamParam}&matchData=${matchPayload}${seasonParam}`;
   };
 
+  // vzhľad karty podľa stavu
   const statusVariant = resolveStatusVariant(match.status);
   const theme = STATUS_STYLES[statusVariant];
 
@@ -127,14 +132,21 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
   const awayLogo = away.logo ?? "/window.svg";
   const favorite = isFavorite(match.id, sport);
 
+  const cardHref = buildDetailHref();
+
   return (
-    <div
-      className={`relative flex items-center text-white px-6 py-5 rounded-2xl transition-colors duration-200 ${theme.card}`}
+    <Link
+      href={cardHref}
+      className="block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
     >
+      <div
+        className={`relative flex items-center text-white px-6 py-5 rounded-2xl transition-colors duration-200 transition-transform hover:-translate-y-1 hover:shadow-[0_25px_45px_rgba(0,0,0,0.35)] ${theme.card}`}
+      >
       <span
         className={`absolute top-3 left-3 h-2 w-2 rounded-full ${theme.dot}`}
       />
 
+      {/* hviezdička na toggle obľúbeného */}
       <button
         type="button"
         onClick={(event) => {
@@ -158,6 +170,7 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
         {favorite ? "★" : "☆"}
       </button>
 
+      {/* textový blok so statusom */}
       <div
         className="
           w-9
@@ -183,6 +196,7 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
 
       <div className="h-10 w-px bg-gray-700/50 mx-2 [@media(min-width:500px)]:mx-4 rounded-full" />
 
+      {/* názvy tímov + liga */}
       <div className="flex-1 flex flex-col gap-2 min-w-0 pr-6">
         <div className="flex items-center gap-3 min-w-0">
           <Image
@@ -192,12 +206,9 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
             height={22}
             className="flex-shrink-0 rounded-sm shadow-sm"
           />
-          <Link
-            href={buildDetailHref(home.id)}
-            className="truncate text-sm sm:text-base text-gray-100 hover:text-white transition-colors"
-          >
+          <span className="truncate text-sm sm:text-base text-gray-100">
             {home.name}
-          </Link>
+          </span>
         </div>
 
         <div className="flex items-center gap-3 min-w-0">
@@ -208,12 +219,9 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
             height={22}
             className="flex-shrink-0 rounded-sm shadow-sm"
           />
-          <Link
-            href={buildDetailHref(away.id)}
-            className="truncate text-sm sm:text-base text-gray-100 hover:text-white transition-colors"
-          >
+          <span className="truncate text-sm sm:text-base text-gray-100">
             {away.name}
-          </Link>
+          </span>
         </div>
 
         <div className="flex flex-col gap-0.5 text-xs text-gray-300">
@@ -224,6 +232,7 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
         </div>
       </div>
 
+      {/* výsledok vpravo */}
       <div
         className="
           w-2 [@media(min-width:500px)]:w-14
@@ -254,6 +263,7 @@ export default function MatchCard({ match, sport }: MatchCardProps) {
       </div>
 
       <div className="w-px bg-gray-700 ml-4 opacity-60" />
-    </div>
+      </div>
+    </Link>
   );
 }
