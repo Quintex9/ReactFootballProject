@@ -91,9 +91,7 @@ npm start
 
 ## 🌐 Nasadená verzia
 
-**Produkčná verzia:** [Pridajte link na nasadenú aplikáciu]
-
-> **Poznámka:** Ak je aplikácia nasadená na Vercel alebo inej platforme, pridajte sem odkaz.
+**Produkčná verzia:** https://react-michal-ivan-sport-project.vercel.app/
 
 ## 📁 Štruktúra projektu
 
@@ -144,7 +142,3 @@ live-sports-dashboard/
 ## 📄 Licencia
 
 Tento projekt je privátny.
-
-## 🤝 Príspevky
-
-Príspevky sú vítané! Pre väčšie zmeny prosím najprv otvorte issue na diskusiu o zmene, ktorú chcete urobiť.
