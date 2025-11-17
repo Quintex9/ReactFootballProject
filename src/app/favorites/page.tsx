@@ -10,6 +10,8 @@ type FavoriteRow = {
   match_payload: Match;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function FavoritesPage() {
   // server component – získame cookie store kvôli session
   const cookieStore = await cookies();
