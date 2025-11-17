@@ -7,15 +7,14 @@ import SportSelector, { SPORTS } from "./components/SportSelector";
 import LeagueSelector from "./components/LeagueSelector";
 import LiveMatches from "./components/LiveMatches";
 import { useFavorites } from "@/context/FavoritesContext";
+import InfoCard from "./components/InfoCard"
+import StatusLegendItem from "./components/StatusLegendItem";
 
 function HomeContent() {
   const { auth, signOut } = useFavorites();
   const searchParams = useSearchParams();
   const selectedSport = searchParams.get("sport") || "football";
   const selectedLeague = searchParams.get("league") || "";
-
-  const sportLabel =
-    SPORTS.find((sport) => sport.key === selectedSport)?.label ?? "Football";
 
   return (
     <>
@@ -31,20 +30,10 @@ function HomeContent() {
           <p className="text-xs uppercase tracking-[0.35em] text-indigo-100/70 mb-4">
             Legenda statusov
           </p>
-          <div className="space-y-4 text-sm text-gray-200">
-            <div className="flex items-center gap-3">
-              <span className="inline-block h-3 w-3 rounded-full bg-emerald-400" />
-              <span>Práve prebieha</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="inline-block h-3 w-3 rounded-full bg-amber-400" />
-              <span>Zápas sa ešte nezačal</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="inline-block h-3 w-3 rounded-full bg-slate-500" />
-              <span>Dohraný alebo odložený duel</span>
-            </div>
-          </div>
+          <StatusLegendItem color="bg-emerald-400" label="Práve prebieha" />
+          <StatusLegendItem color="bg-amber-400" label="Zápas sa ešte nezačal" />
+          <StatusLegendItem color="bg-slate-500" label="Dohraný alebo odložený duel" />
+
         </div>
 
         <div className="rounded-2xl bg-gray-900/70 border border-gray-800/70 p-5 flex flex-col gap-3">
@@ -109,52 +98,32 @@ export default function HomePage() {
             </div>
 
             <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-200/80">
-              <div className="group relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/10 via-white/5 to-transparent px-5 py-4 shadow-lg shadow-black/25 transition-all duration-300 hover:border-indigo-300/40 hover:shadow-indigo-500/10">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500/20 text-lg">
-                    🔁
-                  </span>
-                  <dt className="text-[11px] uppercase tracking-[0.35em] text-indigo-100">
-                    Auto-refresh
-                  </dt>
-                </div>
-                <dd className="mt-3 text-3xl font-semibold text-white">20 s</dd>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  okamžité obnovenie feedu cez SWR
-                </p>
-              </div>
+              <InfoCard
+                icon="🔁"
+                title="Auto-refresh"
+                value="20 s"
+                note="okamžité obnovenie feedu cez SWR"
+                hoverBorderClass="hover:border-indigo-300/40"
+                hoverShadowClass="hover:shadow-indigo-500/10"
+              />
 
-              <div className="group relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/10 via-white/5 to-transparent px-5 py-4 shadow-lg shadow-black/25 transition-all duration-300 hover:border-emerald-200/40 hover:shadow-emerald-400/10">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/20 text-lg">
-                    📡
-                  </span>
-                  <dt className="text-[11px] uppercase tracking-[0.35em] text-emerald-100">
-                    Zdroj dát
-                  </dt>
-                </div>
-                <dd className="mt-3 text-3xl font-semibold text-white">API-SPORTS</dd>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  oficiálne live endpointy a štatistiky
-                </p>
-              </div>
+              <InfoCard
+                icon="📡"
+                title="Zdroj dát"
+                value="API-SPORTS"
+                note="oficiálne live endpointy a štatistiky"
+                hoverBorderClass="hover:border-emerald-200/40"
+                hoverShadowClass="hover:shadow-emerald-400/10"
+              />
 
-              <div className="group relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-white/10 via-white/5 to-transparent px-5 py-4 shadow-lg shadow-black/25 transition-all duration-300 hover:border-amber-200/40 hover:shadow-amber-400/10">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-amber-500/20 text-lg">
-                    ⭐
-                  </span>
-                  <dt className="text-[11px] uppercase tracking-[0.35em] text-amber-100">
-                    Pokryté športy
-                  </dt>
-                </div>
-                <dd className="mt-3 text-3xl font-semibold text-white">
-                  {sportsCount}+
-                </dd>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  futbal, basketbal, hokej a ďalšie ligy
-                </p>
-              </div>
+              <InfoCard
+                icon="⭐"
+                title="Pokryté športy"
+                value={`${sportsCount}+`}
+                note="futbal, basketbal, hokej a ďalšie ligy"
+                hoverBorderClass="hover:border-amber-200/40"
+                hoverShadowClass="hover:shadow-amber-400/10"
+              />
             </dl>
           </div>
         </header>
